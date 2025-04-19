@@ -2,6 +2,14 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { CustomersService } from 'src/customers/customers.service';
 import { McpService } from './mcp.service';
 import { ExecuteFunctionDto } from './dto/execute-function.dto';
+import { validateFunctionParameters } from './validate-mcp-input';
+import {
+  AddNoteToCustomerSchema,
+  CreateCustomerSchema,
+} from './schemas/ia-function-schemas';
+
+type CreateCustomerInput = (typeof CreateCustomerSchema)['_type'];
+type AddNoteToCustomerInput = (typeof AddNoteToCustomerSchema)['_type'];
 
 @Controller('mcp')
 export class McpController {
@@ -14,19 +22,34 @@ export class McpController {
   getFunctions() {
     return this.mcpService.getAvailableFunctions();
   }
-  @Post('execute')
-  execute(@Body() executeFunctionDto: ExecuteFunctionDto) {
-    const { function: functionName, parameters } = executeFunctionDto;
 
-    switch (functionName) {
+  @Post('execute')
+  execute(@Body() body: ExecuteFunctionDto) {
+    const validation = validateFunctionParameters(
+      body.function,
+      body.parameters,
+    );
+
+    if (!validation.valid) {
+      return {
+        error: 'Invalid parameters',
+        details: validation.errors,
+      };
+    }
+
+    switch (body.function) {
       case 'getAllCustomers':
         return this.customersService.findAll();
 
-      case 'addNoteToCustomer':
-        return this.customersService.addNote(parameters.id, parameters);
+      case 'addNoteToCustomer': {
+        const params = validation.data as AddNoteToCustomerInput;
+        return this.customersService.addNote(params.id, { note: params.note });
+      }
 
-      case 'createCustomer':
-        return this.customersService.create(parameters);
+      case 'createCustomer': {
+        const params = validation.data as CreateCustomerInput;
+        return this.customersService.create(params);
+      }
 
       default:
         return { error: 'Function not supported' };

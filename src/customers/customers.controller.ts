@@ -1,4 +1,11 @@
-import { Controller, Get, Param, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Post,
+  Body,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { AddNoteDto } from 'src/mcp/dto/add-note.dto';
@@ -18,7 +25,10 @@ export class CustomersController {
   }
 
   @Post(':id/notes')
-  addNote(@Param('id') id: string, @Body() addNoteDto: AddNoteDto) {
-    return this.customersService.addNote(Number(id), addNoteDto);
+  addNote(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() addNoteDto: AddNoteDto,
+  ) {
+    return this.customersService.addNote(id, addNoteDto);
   }
 }
