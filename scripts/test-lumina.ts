@@ -1,6 +1,7 @@
 import axios from 'axios';
 import * as readline from 'readline';
 import * as kleur from 'kleur';
+import { readFile } from 'fs/promises';
 
 import { ExecuteFunctionDto } from '../src/mcp/dto/execute-function.dto';
 
@@ -20,14 +21,29 @@ function ask(question: string): Promise<string> {
 
 async function main() {
   const jsonArgIndex = process.argv.indexOf('--json');
+  const fileArgIndex = process.argv.indexOf('--file');
+
   let input: string;
 
   if (jsonArgIndex !== -1 && process.argv[jsonArgIndex + 1]) {
     input = process.argv[jsonArgIndex + 1];
+  } else if (fileArgIndex !== -1 && process.argv[fileArgIndex + 1]) {
+    const filePath = process.argv[fileArgIndex + 1];
+    try {
+      const fileContents = await readFile(filePath, 'utf-8');
+      input = fileContents;
+    } catch (err) {
+      console.error(kleur.red(`\n❌ Failed to read file: ${filePath}`));
+      if (err instanceof Error) {
+        console.error(kleur.yellow(err.message));
+      }
+      process.exit(1);
+    }
   } else {
     const prompt = kleur.cyan('💬 Paste your JSON request for Lumina:\n> ');
     input = await ask(prompt);
   }
+
   try {
     const parsed: ExecuteFunctionDto = JSON.parse(input) as ExecuteFunctionDto;
     const res = await axios.post('http://localhost:3000/mcp/execute', parsed);
