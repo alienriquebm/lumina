@@ -10,7 +10,7 @@ function App() {
     setResult(null);
 
     try {
-      const response = await fetch("http://localhost:4000/gemini", {
+      const response = await fetch("http://localhost:3000/mcp/interpret", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt }),

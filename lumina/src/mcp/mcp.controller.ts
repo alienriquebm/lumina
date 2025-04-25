@@ -7,6 +7,7 @@ import {
   AddNoteToCustomerSchema,
   CreateCustomerSchema,
 } from './schemas/ia-function-schemas';
+import { GeminiService } from 'src/gemini/gemini.service';
 
 type CreateCustomerInput = (typeof CreateCustomerSchema)['_type'];
 type AddNoteToCustomerInput = (typeof AddNoteToCustomerSchema)['_type'];
@@ -16,6 +17,7 @@ export class McpController {
   constructor(
     private readonly mcpService: McpService,
     private readonly customersService: CustomersService,
+    private readonly geminiService: GeminiService,
   ) {}
 
   @Get('functions')
@@ -54,5 +56,11 @@ export class McpController {
       default:
         return { error: 'Function not supported' };
     }
+  }
+  @Post('interpret')
+  async interpretPrompt(@Body() body: { prompt: string }) {
+    const { prompt } = body;
+    const response = await this.geminiService.interpretPrompt(prompt);
+    return { response };
   }
 }

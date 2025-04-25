@@ -4,9 +4,12 @@ import { AppService } from './app.service';
 import { CustomersModule } from './customers/customers.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { McpModule } from './mcp/mcp.module';
+import { GeminiModule } from './gemini/gemini.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'lumina.db',
@@ -14,6 +17,7 @@ import { McpModule } from './mcp/mcp.module';
       synchronize: true, // Only for development, set to false in production
     }),
     CustomersModule,
+    GeminiModule,
     McpModule,
   ],
   controllers: [AppController],
