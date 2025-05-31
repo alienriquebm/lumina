@@ -2,7 +2,7 @@ import { useState } from "react";
 
 function App() {
   const [prompt, setPrompt] = useState("");
-  const [result, setResult] = useState<any | null>(null);
+  const [result, setResult] = useState<Record<string, string> | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async () => {
@@ -10,17 +10,28 @@ function App() {
     setResult(null);
 
     try {
-      const response = await fetch("http://localhost:3000/mcp/interpret", {
+      const interpretRes = await fetch("http://localhost:3000/mcp/interpret", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ prompt }),
       });
 
-      const data = await response.json();
-      setResult(data);
+      const interpretData = await interpretRes.json();
+
+      const parsed = JSON.parse(interpretData.response); // 👈 Parseamos la string
+      console.log("🔍 JSON interpretado:", parsed);
+
+      const executeRes = await fetch("http://localhost:3000/mcp/execute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parsed),
+      });
+
+      const executeData = await executeRes.json();
+      setResult(executeData); // 👈 Mostrar el resultado
     } catch (err) {
-      console.error("Error:", err);
-      setResult({ error: "Something went wrong" });
+      console.error("❌ Error:", err);
+      setResult({ error: "Algo salió mal" });
     } finally {
       setLoading(false);
     }
