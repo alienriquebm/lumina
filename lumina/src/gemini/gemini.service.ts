@@ -32,7 +32,8 @@ Available functions:
 
 1. getAllCustomers — no parameters  
 2. createCustomer — parameters: name (string), email (string)  
-3. addNoteToCustomer — parameters: id (number), note (string)  
+3. addNoteToCustomer — parameters: id (number), note (string)
+4. getCustomerCount — no parameters
 
 🛑 Do not explain.  
 🛑 Do not ask questions.  

@@ -13,4 +13,8 @@ export type ExecuteFunctionDto =
   | {
       function: 'createCustomer';
       parameters: CreateCustomerDto;
+    }
+  | {
+      function: 'getCustomerCount';
+      parameters: object;
     };

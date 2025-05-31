@@ -26,7 +26,7 @@ export class McpController {
   }
 
   @Post('execute')
-  execute(@Body() body: ExecuteFunctionDto) {
+  async execute(@Body() body: ExecuteFunctionDto) {
     const validation = validateFunctionParameters(
       body.function,
       body.parameters,
@@ -51,6 +51,11 @@ export class McpController {
       case 'createCustomer': {
         const params = validation.data as CreateCustomerInput;
         return this.customersService.create(params);
+      }
+
+      case 'getCustomerCount': {
+        const customers = await this.customersService.findAll();
+        return { count: customers.length };
       }
 
       default:

@@ -25,6 +25,11 @@ export class McpService {
           { name: 'email', type: 'string' },
         ],
       },
+      {
+        name: 'getCustomerCount',
+        description: 'Returns the total number of customers.',
+        parameters: [],
+      },
     ];
   }
 }
